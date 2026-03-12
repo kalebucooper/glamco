@@ -130,7 +130,7 @@ export default function SignupPage() {
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 placeholder="Your full name"
-                className="w-full px-4 py-3.5 bg-white/05 border border-white/10 rounded-xl text-cream placeholder-[#b8b0a8]/50 outline-none focus:border-electric/50 transition-colors"
+                className="w-full px-4 py-3.5 bg-[#2a1f2e] border border-white/10 rounded-xl text-cream placeholder-[#b8b0a8]/50 outline-none focus:border-electric/50 transition-colors"
               />
             </div>
             <div>
@@ -143,7 +143,7 @@ export default function SignupPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
-                className="w-full px-4 py-3.5 bg-white/05 border border-white/10 rounded-xl text-cream placeholder-[#b8b0a8]/50 outline-none focus:border-electric/50 transition-colors"
+                className="w-full px-4 py-3.5 bg-[#2a1f2e] border border-white/10 rounded-xl text-cream placeholder-[#b8b0a8]/50 outline-none focus:border-electric/50 transition-colors"
               />
             </div>
             <div>
@@ -157,7 +157,7 @@ export default function SignupPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Min. 8 characters"
-                className="w-full px-4 py-3.5 bg-white/05 border border-white/10 rounded-xl text-cream placeholder-[#b8b0a8]/50 outline-none focus:border-electric/50 transition-colors"
+                className="w-full px-4 py-3.5 bg-[#2a1f2e] border border-white/10 rounded-xl text-cream placeholder-[#b8b0a8]/50 outline-none focus:border-electric/50 transition-colors"
               />
             </div>
 

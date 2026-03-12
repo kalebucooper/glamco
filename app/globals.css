@@ -75,6 +75,15 @@ input[type='date']::-webkit-calendar-picker-indicator {
   cursor: pointer;
 }
 
+/* ─── Autofill dark theme fix ───────────────────────────────────────────── */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #f8f3ee;
+  -webkit-box-shadow: 0 0 0px 1000px #2a1f2e inset;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
 /* ─── Stripe Elements dark theme fix ────────────────────────────────────── */
 .StripeElement {
   padding: 14px;
