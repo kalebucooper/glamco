@@ -3,9 +3,17 @@ import { createSupabaseServerClient } from '@/lib/supabase-server'
 import Link from 'next/link'
 import type { Genre } from '@/types'
 
-const GENRES: Genre[] = [
-  'wedding', 'glam', 'drag', 'editorial',
-  'natural', 'sfx', 'avant-garde', 'quinceanera', 'bridal', 'prom',
+const GENRES: { value: Genre; label: string; emoji: string }[] = [
+  { value: 'wedding', label: 'Wedding', emoji: '💍' },
+  { value: 'glam', label: 'Glam', emoji: '✨' },
+  { value: 'drag', label: 'Drag', emoji: '👑' },
+  { value: 'editorial', label: 'Editorial', emoji: '📸' },
+  { value: 'natural', label: 'Natural', emoji: '🌿' },
+  { value: 'sfx', label: 'SFX', emoji: '🎭' },
+  { value: 'avant-garde', label: 'Avant-Garde', emoji: '🎨' },
+  { value: 'quinceanera', label: 'Quinceañera', emoji: '💐' },
+  { value: 'bridal', label: 'Bridal', emoji: '🌸' },
+  { value: 'prom', label: 'Prom', emoji: '🌟' },
 ]
 
 interface Props {
@@ -24,7 +32,6 @@ export default async function ArtistsPage({ searchParams }: Props) {
       session_rate, hourly_rate, genres,
       profile:profiles(full_name, avatar_url, location)
     `)
-    .eq('stripe_onboarded', true)
     .order('avg_rating', { ascending: false })
 
   if (activeGenre) {
@@ -33,7 +40,6 @@ export default async function ArtistsPage({ searchParams }: Props) {
 
   const { data: artists } = await dbQuery.limit(48)
 
-  // Client-side name filter (simple, works for MVP)
   const filtered = query
     ? (artists ?? []).filter((a) => {
         const profile = Array.isArray(a.profile) ? a.profile[0] : a.profile
@@ -42,116 +48,92 @@ export default async function ArtistsPage({ searchParams }: Props) {
     : (artists ?? [])
 
   return (
-    <main className="min-h-screen bg-[#0a060a] pt-24 pb-20">
-      <div className="max-w-6xl mx-auto px-6">
+    <main className="min-h-screen bg-[#0a060a] pt-20 pb-20">
+      <div className="max-w-4xl mx-auto px-4">
 
-        {/* Header */}
-        <div className="mb-12">
-          <h1 className="font-playfair text-5xl font-black mb-3">Find an Artist</h1>
-          <p className="text-[#b8b0a8] text-sm">
-            {filtered.length} artist{filtered.length !== 1 ? 's' : ''} available
-            {activeGenre ? ` for ${activeGenre}` : ''}
-          </p>
-        </div>
-
-        {/* Search + Genre Filters */}
-        <div className="flex flex-col md:flex-row gap-4 mb-10">
-          {/* Search box — client-side via URL */}
-          <form method="GET" className="flex-1">
+        {/* Search bar */}
+        <div className="py-4 sticky top-16 z-40 bg-[#0a060a]/90 backdrop-blur-xl">
+          <form method="GET">
+            {activeGenre && <input type="hidden" name="genre" value={activeGenre} />}
             <input
               type="text"
               name="q"
               defaultValue={query}
-              placeholder="Search by name…"
-              className="w-full px-5 py-3.5 bg-white/05 border border-white/10 rounded-xl text-cream placeholder-[#b8b0a8]/50 outline-none focus:border-electric/50 transition-colors text-sm"
+              placeholder="Search artists..."
+              className="w-full px-5 py-3 bg-[#1a1420] border border-white/10 rounded-xl text-cream placeholder-[#b8b0a8]/50 outline-none focus:border-electric/50 transition-colors text-sm"
             />
           </form>
         </div>
 
-        {/* Genre pills */}
-        <div className="flex flex-wrap gap-2 mb-10">
-          <Link
-            href="/artists"
-            className={`px-4 py-2 rounded-full text-xs font-semibold uppercase tracking-wider border transition-colors ${
-              !activeGenre
-                ? 'bg-electric/15 border-electric/40 text-electric'
-                : 'border-white/15 text-[#b8b0a8] hover:border-white/30 hover:text-cream'
-            }`}
-          >
-            All
+        {/* Genre story-style pills */}
+        <div className="flex gap-4 overflow-x-auto py-4 mb-6 scrollbar-hide">
+          <Link href="/artists" className="flex-shrink-0 flex flex-col items-center gap-1.5">
+            <div className={`w-16 h-16 rounded-full p-0.5 ${!activeGenre ? 'bg-gradient-electric' : 'bg-white/20'}`}>
+              <div className="w-full h-full rounded-full bg-[#0a060a] flex items-center justify-center text-xl">
+                🔍
+              </div>
+            </div>
+            <span className={`text-[10px] uppercase tracking-wider ${!activeGenre ? 'text-electric' : 'text-[#b8b0a8]'}`}>All</span>
           </Link>
-          {GENRES.map((g) => (
-            <Link
-              key={g}
-              href={`/artists?genre=${g}`}
-              className={`px-4 py-2 rounded-full text-xs font-semibold uppercase tracking-wider border transition-colors ${
-                activeGenre === g
-                  ? 'bg-electric/15 border-electric/40 text-electric'
-                  : 'border-white/15 text-[#b8b0a8] hover:border-white/30 hover:text-cream'
-              }`}
-            >
-              {g}
+          {GENRES.map(({ value, label, emoji }) => (
+            <Link key={value} href={`/artists?genre=${value}`} className="flex-shrink-0 flex flex-col items-center gap-1.5">
+              <div className={`w-16 h-16 rounded-full p-0.5 ${activeGenre === value ? 'bg-gradient-electric' : 'bg-white/20'}`}>
+                <div className="w-full h-full rounded-full bg-[#0a060a] flex items-center justify-center text-xl">
+                  {emoji}
+                </div>
+              </div>
+              <span className={`text-[10px] uppercase tracking-wider ${activeGenre === value ? 'text-electric' : 'text-[#b8b0a8]'}`}>
+                {label}
+              </span>
             </Link>
           ))}
         </div>
 
-        {/* Artist Grid */}
+        {/* Count */}
+        <p className="text-xs text-[#b8b0a8] uppercase tracking-widest mb-4">
+          {filtered.length} artist{filtered.length !== 1 ? 's' : ''}
+          {activeGenre ? ` · ${activeGenre}` : ''}
+        </p>
+
+        {/* Instagram-style grid */}
         {filtered.length === 0 ? (
           <div className="text-center py-24 text-[#b8b0a8]">
-            No artists found. Try a different genre or search term.
+            No artists found. Try a different style or search.
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+          <div className="grid grid-cols-3 gap-0.5">
             {filtered.map((artist) => {
               const profile = Array.isArray(artist.profile) ? artist.profile[0] : artist.profile
               return (
                 <Link
                   key={artist.id}
                   href={`/artist/${artist.id}`}
-                  className="group bg-card-bg rounded-3xl border border-white/08 overflow-hidden hover:border-electric/30 transition-all hover:-translate-y-1"
+                  className="group relative aspect-square overflow-hidden bg-gradient-to-br from-electric/10 to-purple-900/15"
                 >
-                  {/* Avatar */}
-                  <div className="aspect-square bg-gradient-to-br from-electric/15 to-purple-900/20 flex items-center justify-center overflow-hidden">
-                    {profile?.avatar_url ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={profile.avatar_url}
-                        alt={profile.full_name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                    ) : (
-                      <span className="font-playfair text-5xl font-black text-white/20">
+                  {profile?.avatar_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={profile.avatar_url}
+                      alt={profile.full_name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <span className="font-playfair text-5xl font-black text-white/10">
                         {profile?.full_name?.[0] ?? '?'}
                       </span>
+                    </div>
+                  )}
+                  {/* Hover overlay */}
+                  <div className="absolute inset-0 bg-black/65 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-1 p-3">
+                    <p className="font-semibold text-white text-sm text-center leading-tight">{profile?.full_name}</p>
+                    <p className="text-xs text-white/60 text-center">{artist.genres?.slice(0, 2).join(' · ')}</p>
+                    {artist.avg_rating > 0 && (
+                      <p className="text-xs text-yellow-400 mt-1">★ {artist.avg_rating.toFixed(1)}</p>
                     )}
-                  </div>
-
-                  {/* Info */}
-                  <div className="p-5">
-                    <p className="font-semibold text-cream text-sm mb-1 truncate">
-                      {profile?.full_name}
-                    </p>
-                    <div className="flex items-center justify-between mb-3">
-                      <p className="text-xs text-[#b8b0a8] truncate">{profile?.location ?? 'Remote'}</p>
-                      {artist.avg_rating > 0 && (
-                        <p className="text-xs text-yellow-400 shrink-0">
-                          ★ {artist.avg_rating.toFixed(1)}
-                        </p>
-                      )}
-                    </div>
-                    <div className="flex flex-wrap gap-1">
-                      {artist.genres.slice(0, 2).map((g) => (
-                        <span
-                          key={g}
-                          className="text-[10px] px-2 py-0.5 rounded-full bg-electric/08 text-electric border border-electric/20 uppercase tracking-wider"
-                        >
-                          {g}
-                        </span>
-                      ))}
-                    </div>
-                    <p className="text-xs text-[#b8b0a8] mt-3">
-                      From <span className="text-cream font-semibold">${artist.session_rate}</span>
-                    </p>
+                    {artist.session_rate > 0 && (
+                      <p className="text-xs text-electric mt-0.5">From ${artist.session_rate}</p>
+                    )}
                   </div>
                 </Link>
               )
