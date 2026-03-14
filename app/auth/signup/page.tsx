@@ -15,6 +15,7 @@ export default function SignupPage() {
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [checkEmail, setCheckEmail] = useState(false)
 
   const supabase = createClient()
 
@@ -28,7 +29,8 @@ export default function SignupPage() {
       email,
       password,
       options: {
-        data: { full_name: fullName },
+        data: { full_name: fullName, role },
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
       },
     })
 
@@ -38,12 +40,18 @@ export default function SignupPage() {
       return
     }
 
+    // If email confirmation is required, user won't be in session yet
+    if (!data.session) {
+      setCheckEmail(true)
+      setLoading(false)
+      return
+    }
+
     // Update role on the profile (trigger defaults to 'client')
     if (data.user) {
       const db = supabase as any
       await db.from('profiles').update({ role }).eq('id', data.user.id)
 
-      // If artist, create the artist_profiles row
       if (role === 'artist') {
         await db.from('artist_profiles').insert({ profile_id: data.user.id })
       }
@@ -63,6 +71,24 @@ export default function SignupPage() {
       setError(error.message)
       setLoading(false)
     }
+  }
+
+  if (checkEmail) {
+    return (
+      <main className="min-h-screen bg-[#0a060a] flex items-center justify-center px-6">
+        <div className="w-full max-w-md text-center">
+          <div className="text-6xl mb-6">📬</div>
+          <h1 className="font-playfair text-3xl font-black text-cream mb-3">Check your email</h1>
+          <p className="text-[#b8b0a8] mb-6">
+            We sent a confirmation link to <span className="text-cream font-semibold">{email}</span>.
+            Click it to activate your account.
+          </p>
+          <Link href="/auth/login" className="text-electric hover:text-blush transition-colors text-sm">
+            Back to sign in
+          </Link>
+        </div>
+      </main>
+    )
   }
 
   return (
