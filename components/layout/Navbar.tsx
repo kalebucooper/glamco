@@ -22,6 +22,7 @@ export function Navbar() {
       {/* Links */}
       <ul className="hidden md:flex items-center gap-9">
         {[
+          ['Feed', '/feed'],
           ['Find Artists', '/artists'],
           ['Shop', '/shop'],
         ].map(([label, href]) => (

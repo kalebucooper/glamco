@@ -5,6 +5,8 @@ import { useState } from 'react'
 import { format } from 'date-fns'
 import { ExternalLink } from 'lucide-react'
 import { useToast } from '@/components/ui/Toaster'
+import { CreatePost } from '@/components/artist/CreatePost'
+import { KitManager } from '@/components/artist/KitManager'
 import type { Profile, ArtistProfile, Booking } from '@/types'
 
 interface Props {
@@ -132,6 +134,15 @@ export function ArtistDashboard({ profile, artistProfile, bookings }: Props) {
             </div>
           )}
         </section>
+
+        {/* Create Post + Kit Manager */}
+        {artistProfile?.id && (
+          <div className="grid md:grid-cols-2 gap-6 mt-10">
+            <CreatePost artistId={artistProfile.id} />
+            <KitManager artistId={artistProfile.id} />
+          </div>
+        )}
+
       </div>
     </main>
   )

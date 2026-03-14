@@ -49,6 +49,8 @@ export interface ArtistProfile {
   avg_rating: number
   total_reviews: number
   total_bookings: number
+  follower_count: number
+  post_count: number
   created_at: string
   // Joined relation — available when queried with profile data
   profile?: Profile
@@ -176,6 +178,51 @@ export interface Favorite {
   artist_id: string
   created_at: string
   artist?: ArtistProfile & { profile: Profile }
+}
+
+// ─── Social Features ──────────────────────────────────────────────────────────
+
+export interface Post {
+  id: string
+  artist_id: string
+  caption: string | null
+  image_url: string
+  genre: Genre | null
+  likes_count: number
+  comments_count: number
+  created_at: string
+  artist?: ArtistProfile & { profile: Profile }
+  liked_by_me?: boolean
+}
+
+export interface PostComment {
+  id: string
+  post_id: string
+  user_id: string
+  body: string
+  created_at: string
+  user?: Pick<Profile, 'id' | 'full_name' | 'avatar_url'>
+}
+
+export interface Follow {
+  follower_id: string
+  following_id: string
+  created_at: string
+}
+
+export interface KitProduct {
+  id: string
+  artist_id: string
+  name: string
+  brand: string
+  description: string | null
+  image_url: string | null
+  affiliate_url: string
+  price_display: string | null
+  category: string | null
+  is_favorite: boolean
+  sort_order: number
+  created_at: string
 }
 
 // ─── API Response Shapes ──────────────────────────────────────────────────────
